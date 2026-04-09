@@ -24,12 +24,12 @@ type Link = {
 }
 
 const THEMES: Record<string, string> = {
-  dark:   'linear-gradient(160deg, #0f0f1a 0%, #1a0f2e 50%, #0f0f1a 100%)',
-  purple: 'linear-gradient(160deg, #1a0033 0%, #2d0050 50%, #1a0033 100%)',
-  ocean:  'linear-gradient(160deg, #001a33 0%, #002d50 50%, #001a33 100%)',
-  forest: 'linear-gradient(160deg, #001a0f 0%, #002d1a 50%, #001a0f 100%)',
-  sunset: 'linear-gradient(160deg, #1a0a00 0%, #2d1500 50%, #1a0a00 100%)',
-  rose:   'linear-gradient(160deg, #1a0010 0%, #2d0020 50%, #1a0010 100%)',
+  dark:   'radial-gradient(ellipse 80% 60% at 50% -10%, #1a0f3a 0%, #08080f 60%)',
+  purple: 'radial-gradient(ellipse 80% 60% at 50% -10%, #2d0060 0%, #0d0020 60%)',
+  ocean:  'radial-gradient(ellipse 80% 60% at 50% -10%, #003060 0%, #000d20 60%)',
+  forest: 'radial-gradient(ellipse 80% 60% at 50% -10%, #003020 0%, #000d08 60%)',
+  sunset: 'radial-gradient(ellipse 80% 60% at 50% -10%, #3a1500 0%, #120500 60%)',
+  rose:   'radial-gradient(ellipse 80% 60% at 50% -10%, #400028 0%, #130008 60%)',
 }
 
 export default function PublicPage() {
@@ -39,16 +39,14 @@ export default function PublicPage() {
   const [clickingId, setClickingId] = useState<string | null>(null)
 
   useEffect(() => {
-    async function load() {
-      const [{ data: profileData }, { data: linksData }] = await Promise.all([
-        supabase.from('linky_profile').select('*').single(),
-        supabase.from('linky_links').select('*').eq('is_active', true).order('order_index'),
-      ])
-      if (profileData) setProfile(profileData as Profile)
-      if (linksData) setLinks(linksData as Link[])
+    Promise.all([
+      supabase.from('linky_profile').select('*').single(),
+      supabase.from('linky_links').select('*').eq('is_active', true).order('order_index'),
+    ]).then(([{ data: p }, { data: l }]) => {
+      if (p) setProfile(p as Profile)
+      if (l) setLinks(l as Link[])
       setLoading(false)
-    }
-    load()
+    })
   }, [])
 
   async function handleClick(link: Link) {
@@ -57,7 +55,7 @@ export default function PublicPage() {
     setTimeout(() => {
       window.open(link.url, '_blank', 'noopener,noreferrer')
       setClickingId(null)
-    }, 150)
+    }, 140)
   }
 
   const bg = THEMES[profile?.theme ?? 'dark']
@@ -65,80 +63,107 @@ export default function PublicPage() {
 
   if (loading) {
     return (
-      <div style={{ background: THEMES.dark }} className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/80 animate-spin" />
+      <div style={{ background: '#08080f' }} className="min-h-dvh flex items-center justify-center">
+        <div className="spinner" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen pb-16" style={{ background: bg }}>
-      <div className="max-w-[480px] mx-auto px-4 pt-14">
+    <div className="min-h-dvh" style={{ background: bg }}>
+      {/* 상단 글로우 */}
+      <div
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] pointer-events-none"
+        style={{ background: `radial-gradient(ellipse, ${accent}18 0%, transparent 70%)`, filter: 'blur(40px)' }}
+      />
 
-        {/* 프로필 */}
-        <div className="flex flex-col items-center mb-8">
+      <div className="relative max-w-[420px] mx-auto px-5 pt-16 pb-20 fade-in">
+
+        {/* ── 프로필 ── */}
+        <div className="flex flex-col items-center text-center mb-10">
+          {/* 아바타 */}
           <div
-            className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4 shadow-2xl overflow-hidden"
-            style={{ background: `${accent}22`, border: `2px solid ${accent}55` }}
+            className="w-[88px] h-[88px] rounded-full flex items-center justify-center text-[44px] mb-5 overflow-hidden"
+            style={{
+              background: `${accent}18`,
+              border: `1.5px solid ${accent}35`,
+              boxShadow: `0 0 0 6px ${accent}10, 0 8px 32px rgba(0,0,0,0.4)`,
+            }}
           >
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
             ) : (
-              <span>{profile?.avatar_emoji ?? '✨'}</span>
+              profile?.avatar_emoji ?? '✨'
             )}
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">{profile?.display_name ?? 'My Links'}</h1>
+
+          <h1 className="text-[22px] font-bold mb-2" style={{ color: '#f0f0ff', letterSpacing: '-0.3px' }}>
+            {profile?.display_name ?? 'My Links'}
+          </h1>
+
           {profile?.bio && (
-            <p className="text-sm text-center leading-relaxed max-w-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <p className="text-[14px] leading-relaxed max-w-[280px]" style={{ color: 'rgba(255,255,255,0.52)' }}>
               {profile.bio}
             </p>
           )}
         </div>
 
-        {/* 링크 목록 */}
-        <div className="flex flex-col gap-3">
-          {links.map(link => (
-            <button
-              key={link.id}
-              onClick={() => handleClick(link)}
-              className="link-card w-full text-left px-5 py-4 flex items-center gap-4"
-              style={{
-                background: clickingId === link.id ? `${accent}22` : 'rgba(255,255,255,0.07)',
-                border: `1px solid ${clickingId === link.id ? accent + '55' : 'rgba(255,255,255,0.12)'}`,
-                borderRadius: '16px',
-                boxShadow: clickingId === link.id ? `0 0 20px ${accent}30` : undefined,
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
-                style={{ background: `${accent}22` }}
+        {/* ── 링크 목록 ── */}
+        <div className="flex flex-col gap-[10px]">
+          {links.map(link => {
+            const active = clickingId === link.id
+            return (
+              <button
+                key={link.id}
+                onClick={() => handleClick(link)}
+                className="link-card w-full text-left flex items-center gap-4 px-5 py-[18px]"
+                style={{
+                  borderColor: active ? `${accent}50` : undefined,
+                  background: active ? `${accent}14` : undefined,
+                  boxShadow: active ? `0 0 0 1px ${accent}40, 0 8px 24px rgba(0,0,0,0.3)` : undefined,
+                }}
               >
-                {link.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-white text-sm leading-tight">{link.title}</p>
-                {link.description && (
-                  <p className="text-xs mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {link.description}
+                {/* 아이콘 */}
+                <div
+                  className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center text-[20px] shrink-0"
+                  style={{ background: `${accent}18`, border: `1px solid ${accent}25` }}
+                >
+                  {link.icon}
+                </div>
+
+                {/* 텍스트 */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[14px] leading-snug truncate" style={{ color: '#f0f0ff' }}>
+                    {link.title}
                   </p>
-                )}
-              </div>
-              <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
-            </button>
-          ))}
+                  {link.description && (
+                    <p className="text-[12px] mt-[3px] truncate" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                      {link.description}
+                    </p>
+                  )}
+                </div>
+
+                <ChevronRight
+                  className="w-[16px] h-[16px] shrink-0"
+                  style={{ color: active ? accent : 'rgba(255,255,255,0.22)' }}
+                />
+              </button>
+            )
+          })}
 
           {links.length === 0 && (
-            <div className="text-center py-16" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              <p className="text-4xl mb-3">🔗</p>
-              <p className="text-sm">아직 등록된 링크가 없어요</p>
+            <div className="card flex flex-col items-center py-16 gap-3">
+              <span className="text-4xl">🔗</span>
+              <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>아직 등록된 링크가 없어요</p>
             </div>
           )}
         </div>
 
-        <div className="mt-12 flex justify-center">
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>Linky ✦</p>
-        </div>
+        {/* ── 하단 ── */}
+        <p className="text-center text-[11px] mt-12" style={{ color: 'rgba(255,255,255,0.15)', letterSpacing: '0.5px' }}>
+          LINKY
+        </p>
       </div>
     </div>
   )
