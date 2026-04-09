@@ -1,159 +1,148 @@
 @import "tailwindcss";
 
-/* ── Design Tokens ─────────────────────────────────────────── */
-:root {
-  /* Background */
-  --bg-base:     #08080f;
-  --bg-surface:  rgba(255, 255, 255, 0.045);
-  --bg-elevated: rgba(255, 255, 255, 0.08);
-  --bg-hover:    rgba(255, 255, 255, 0.10);
+/* ─── Design Tokens ───────────────────────────────────────────
+   @theme 으로 정의해야 Tailwind v4 유틸리티와 연동됩니다        */
+@theme {
+  --color-bg-base:      #08080f;
+  --color-bg-surface:   rgba(255,255,255,0.045);
+  --color-bg-elevated:  rgba(255,255,255,0.08);
+  --color-bg-hover:     rgba(255,255,255,0.10);
 
-  /* Border */
-  --border:      rgba(255, 255, 255, 0.09);
-  --border-focus: rgba(124, 58, 237, 0.6);
+  --color-text-primary:   #f0f0ff;
+  --color-text-secondary: rgba(255,255,255,0.55);
+  --color-text-dim:       rgba(255,255,255,0.28);
 
-  /* Text */
-  --text-primary:   #f0f0ff;
-  --text-secondary: rgba(255, 255, 255, 0.55);
-  --text-dim:       rgba(255, 255, 255, 0.28);
+  --color-accent:       #7c3aed;
+  --color-accent-light: #a78bfa;
+  --color-border:       rgba(255,255,255,0.09);
+  --color-border-focus: rgba(124,58,237,0.6);
 
-  /* Accent */
-  --accent:       #7c3aed;
-  --accent-light: #a78bfa;
-  --accent-glow:  rgba(124, 58, 237, 0.35);
-
-  /* Spacing scale (8px grid) */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 20px;
-  --sp-6: 24px;
-  --sp-8: 32px;
-  --sp-10: 40px;
-  --sp-12: 48px;
-
-  /* Radius */
-  --r-sm:  10px;
-  --r-md:  14px;
-  --r-lg:  18px;
-  --r-xl:  22px;
-  --r-2xl: 28px;
-  --r-full: 999px;
-
-  /* Shadow */
-  --shadow-card: 0 2px 20px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 24px var(--accent-glow);
+  --radius-sm:  10px;
+  --radius-md:  14px;
+  --radius-lg:  18px;
+  --radius-xl:  22px;
+  --radius-2xl: 28px;
 }
 
-/* ── Reset ─────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-* { margin: 0; padding: 0; }
-
-html {
-  -webkit-tap-highlight-color: transparent;
-  text-size-adjust: 100%;
+/* ─── Base ────────────────────────────────────────────────────
+   @layer base 안에 있어야 Tailwind 유틸리티가 덮어쓸 수 있음   */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    background: #08080f;
+    color: #f0f0ff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    min-height: 100dvh;
+  }
+  * { box-sizing: border-box; }
 }
 
-body {
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', sans-serif;
-  min-height: 100dvh;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
+/* ─── Components ──────────────────────────────────────────────
+   @layer components 안에 있어야 Tailwind 유틸리티가 덮어쓸 수 있음 */
+@layer components {
+
+  /* Glass card */
+  .card {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 18px;
+  }
+
+  /* Public link card */
+  .link-card {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 22px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, border-color 0.15s ease,
+                transform 0.12s ease, box-shadow 0.15s ease;
+    will-change: transform;
+  }
+  .link-card:hover  { background: rgba(255,255,255,0.08); transform: translateY(-1px); box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+  .link-card:active { transform: scale(0.977); box-shadow: none; }
+
+  /* Input */
+  .inp {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #f0f0ff;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .inp::placeholder { color: rgba(255,255,255,0.28); }
+  .inp:focus        { border-color: rgba(124,58,237,0.65); }
+
+  /* Primary button */
+  .btn-primary {
+    background: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 20px rgba(109,40,217,0.45);
+  }
+  .btn-primary:hover    { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(109,40,217,0.55); }
+  .btn-primary:active   { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.35; transform: none; box-shadow: none; cursor: not-allowed; }
+
+  /* Ghost button */
+  .btn-ghost {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 14px;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.09); color: #f0f0ff; }
+
+  /* Icon button */
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    color: rgba(255,255,255,0.5);
+    transition: background 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .btn-icon:hover { background: rgba(255,255,255,0.09); color: #f0f0ff; }
+
+  /* Spinner */
+  .spinner {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.12);
+    border-top-color: rgba(255,255,255,0.8);
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* Fade in */
+  .fade-in { animation: fadeIn 0.25s ease; }
 }
 
-/* ── Glass Card ────────────────────────────────────────────── */
-.card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-}
+/* ─── Keyframes (outside layer — globally available) ─────────── */
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes fadeIn  { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 
-/* ── Link Card (public page) ───────────────────────────────── */
-.link-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  will-change: transform;
-}
-.link-card:hover  { background: var(--bg-hover); transform: translateY(-1px); box-shadow: var(--shadow-card); }
-.link-card:active { transform: scale(0.977); box-shadow: none; }
-
-/* ── Input ─────────────────────────────────────────────────── */
-.inp {
-  width: 100%;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  padding: 14px 16px;
-  font-size: 14px;
-  color: var(--text-primary);
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-.inp::placeholder { color: var(--text-dim); }
-.inp:focus { border-color: var(--border-focus); }
-
-/* ── Primary Button ────────────────────────────────────────── */
-.btn-primary {
-  background: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6);
-  color: #fff;
-  font-weight: 700;
-  border-radius: var(--r-md);
-  transition: opacity 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 20px rgba(109, 40, 217, 0.45);
-}
-.btn-primary:hover  { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(109, 40, 217, 0.55); }
-.btn-primary:active { transform: scale(0.97); }
-.btn-primary:disabled { opacity: 0.35; transform: none; box-shadow: none; cursor: not-allowed; }
-
-/* ── Ghost Button ──────────────────────────────────────────── */
-.btn-ghost {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  color: var(--text-secondary);
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); }
-
-/* ── Icon Button ───────────────────────────────────────────── */
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--r-sm);
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  transition: background 0.15s ease, color 0.15s ease;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.btn-icon:hover { background: var(--bg-elevated); color: var(--text-primary); }
-
-/* ── Spinner ───────────────────────────────────────────────── */
-.spinner {
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.15);
-  border-top-color: rgba(255,255,255,0.85);
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Page fade-in ──────────────────────────────────────────── */
-.fade-in { animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-/* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 3px; }
+/* ─── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
