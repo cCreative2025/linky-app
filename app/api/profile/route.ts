@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
   }
   const sb = getSupabase()
-  const { data, error } = await sb.from('profile').select('*').single()
+  const { data, error } = await sb.from('linky_profile').select('*').single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest) {
   const sb = getSupabase()
 
   // upsert (profile은 row 1개)
-  const { data, error } = await sb.from('profile').upsert({
+  const { data, error } = await sb.from('linky_profile').upsert({
     id: '00000000-0000-0000-0000-000000000001',
     ...body,
     updated_at: new Date().toISOString(),

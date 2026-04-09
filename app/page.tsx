@@ -41,8 +41,8 @@ export default function PublicPage() {
   useEffect(() => {
     async function load() {
       const [{ data: profileData }, { data: linksData }] = await Promise.all([
-        supabase.from('profile').select('*').single(),
-        supabase.from('links').select('*').eq('is_active', true).order('order_index'),
+        supabase.from('linky_profile').select('*').single(),
+        supabase.from('linky_links').select('*').eq('is_active', true).order('order_index'),
       ])
       if (profileData) setProfile(profileData as Profile)
       if (linksData) setLinks(linksData as Link[])
@@ -53,7 +53,7 @@ export default function PublicPage() {
 
   async function handleClick(link: Link) {
     setClickingId(link.id)
-    supabase.from('links').update({ click_count: link.click_count + 1 }).eq('id', link.id).then(() => {})
+    supabase.from('linky_links').update({ click_count: link.click_count + 1 }).eq('id', link.id).then(() => {})
     setTimeout(() => {
       window.open(link.url, '_blank', 'noopener,noreferrer')
       setClickingId(null)

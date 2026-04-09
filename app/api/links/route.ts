@@ -17,7 +17,7 @@ function unauthorized() {
 export async function GET(request: NextRequest) {
   if (!isValidSession(request.cookies.get('linky_session'))) return unauthorized()
   const sb = getSupabase()
-  const { data, error } = await sb.from('links').select('*').order('order_index')
+  const { data, error } = await sb.from('linky_links').select('*').order('order_index')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
   const sb = getSupabase()
 
   // 현재 최대 order_index 조회
-  const { data: existing } = await sb.from('links').select('order_index').order('order_index', { ascending: false }).limit(1)
+  const { data: existing } = await sb.from('linky_links').select('order_index').order('order_index', { ascending: false }).limit(1)
   const nextOrder = existing && existing.length > 0 ? (existing[0].order_index + 1) : 0
 
-  const { data, error } = await sb.from('links').insert({
+  const { data, error } = await sb.from('linky_links').insert({
     title: body.title,
     url: body.url,
     description: body.description ?? null,
@@ -54,7 +54,7 @@ export async function PATCH(request: NextRequest) {
   // 순서 일괄 업데이트
   if (body.reorder && Array.isArray(body.reorder)) {
     const updates = body.reorder.map((item: { id: string; order_index: number }) =>
-      sb.from('links').update({ order_index: item.order_index }).eq('id', item.id)
+      sb.from('linky_links').update({ order_index: item.order_index }).eq('id', item.id)
     )
     await Promise.all(updates)
     return NextResponse.json({ ok: true })
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest) {
 
   // 단일 링크 수정
   const { id, ...fields } = body
-  const { data, error } = await sb.from('links').update(fields).eq('id', id).select().single()
+  const { data, error } = await sb.from('linky_links').update(fields).eq('id', id).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
@@ -72,7 +72,7 @@ export async function DELETE(request: NextRequest) {
   if (!isValidSession(request.cookies.get('linky_session'))) return unauthorized()
   const { id } = await request.json()
   const sb = getSupabase()
-  const { error } = await sb.from('links').delete().eq('id', id)
+  const { error } = await sb.from('linky_links').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
