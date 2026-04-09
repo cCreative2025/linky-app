@@ -1,25 +1,21 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
-
-const THEMES = [
-  { id: 'dark',   label: '다크',     bg: 'radial-gradient(ellipse at 50% 0%, #1a0f3a, #08080f)' },
-  { id: 'purple', label: '퍼플',     bg: 'radial-gradient(ellipse at 50% 0%, #2d0060, #0d0020)' },
-  { id: 'ocean',  label: '오션',     bg: 'radial-gradient(ellipse at 50% 0%, #003060, #000d20)' },
-  { id: 'forest', label: '포레스트', bg: 'radial-gradient(ellipse at 50% 0%, #003020, #000d08)' },
-  { id: 'sunset', label: '선셋',     bg: 'radial-gradient(ellipse at 50% 0%, #3a1500, #120500)' },
-  { id: 'rose',   label: '로즈',     bg: 'radial-gradient(ellipse at 50% 0%, #400028, #130008)' },
-]
+import { THEMES, getTheme } from '@/lib/themes'
 
 const ACCENTS = [
-  { id: '#7c3aed', label: '퍼플'   },
-  { id: '#3b82f6', label: '블루'   },
-  { id: '#ec4899', label: '핑크'   },
-  { id: '#10b981', label: '그린'   },
-  { id: '#f59e0b', label: '옐로'   },
-  { id: '#ef4444', label: '레드'   },
+  { id: '#7c3aed', label: '퍼플'    },
+  { id: '#3b82f6', label: '블루'    },
+  { id: '#ec4899', label: '핑크'    },
+  { id: '#10b981', label: '그린'    },
+  { id: '#f59e0b', label: '옐로'    },
+  { id: '#ef4444', label: '레드'    },
   { id: '#8b5cf6', label: '바이올렛' },
-  { id: '#06b6d4', label: '시안'   },
+  { id: '#06b6d4', label: '시안'    },
+  { id: '#f97316', label: '오렌지'  },
+  { id: '#14b8a6', label: '틸'      },
+  { id: '#a855f7', label: '라벤더'  },
+  { id: '#1d4ed8', label: '네이비'  },
 ]
 
 export default function AppearancePage() {
@@ -47,7 +43,8 @@ export default function AppearancePage() {
     setTimeout(() => setSaved(false), 2200)
   }
 
-  const currentTheme = THEMES.find(t => t.id === theme)
+  const current = getTheme(theme)
+  const isLight = current.light
 
   if (loading) return (
     <div className="flex justify-center py-24">
@@ -61,57 +58,50 @@ export default function AppearancePage() {
 
       {/* ── 미리보기 ── */}
       <div
-        className="relative overflow-hidden rounded-[18px] mb-6 h-[120px] flex items-center justify-center"
-        style={{ background: currentTheme?.bg, border: '1px solid rgba(255,255,255,0.08)' }}
+        className="relative overflow-hidden rounded-[18px] mb-6 h-[130px] flex items-center justify-center"
+        style={{ background: current.bg, border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}` }}
       >
-        {/* 아바타 미니 */}
         <div className="flex flex-col items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full" style={{ background: `${accent}30`, border: `1.5px solid ${accent}50` }}>
-            <div className="w-full h-full rounded-full flex items-center justify-center text-lg">✨</div>
+          {/* 아바타 */}
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg"
+            style={{ background: `${accent}25`, border: `1.5px solid ${accent}50` }}>
+            ✨
           </div>
+          {/* 이름/소개 바 */}
           <div className="flex flex-col items-center gap-1.5">
-            <div className="h-2 w-20 rounded-full" style={{ background: 'rgba(255,255,255,0.25)' }} />
-            <div className="h-1.5 w-14 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
+            <div className="h-2 w-20 rounded-full" style={{ background: isLight ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.25)' }} />
+            <div className="h-1.5 w-14 rounded-full" style={{ background: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.12)' }} />
           </div>
           {/* 미니 링크 카드 */}
-          <div className="h-7 w-36 rounded-[8px] flex items-center px-2.5 gap-2"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div className="w-3.5 h-3.5 rounded" style={{ background: `${accent}40` }} />
-            <div className="h-1.5 flex-1 rounded-full" style={{ background: 'rgba(255,255,255,0.2)' }} />
+          <div className="h-7 w-40 rounded-[8px] flex items-center px-2.5 gap-2"
+            style={{ background: current.cardBg, border: `1px solid ${current.cardBorder}` }}>
+            <div className="w-3.5 h-3.5 rounded-[4px]" style={{ background: `${accent}40` }} />
+            <div className="h-1.5 flex-1 rounded-full" style={{ background: isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)' }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.15)' }} />
           </div>
         </div>
       </div>
 
-      {/* ── 배경 테마 ── */}
+      {/* ── 배경 테마 — 다크 ── */}
       <div className="card p-5 mb-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>배경</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          🌙 다크 테마
+        </p>
         <div className="grid grid-cols-3 gap-2.5">
-          {THEMES.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTheme(t.id)}
-              className="relative h-[64px] rounded-[14px] overflow-hidden transition-all"
-              style={{
-                background: t.bg,
-                border: `2px solid ${theme === t.id ? accent : 'rgba(255,255,255,0.08)'}`,
-                boxShadow: theme === t.id ? `0 0 16px ${accent}40` : undefined,
-              }}
-            >
-              <span
-                className="absolute bottom-1.5 left-0 right-0 text-center text-[10px] font-semibold"
-                style={{ color: 'rgba(255,255,255,0.7)' }}
-              >
-                {t.label}
-              </span>
-              {theme === t.id && (
-                <div
-                  className="absolute top-2 right-2 w-4 h-4 rounded-full flex items-center justify-center"
-                  style={{ background: accent }}
-                >
-                  <Check className="w-2.5 h-2.5 text-white" />
-                </div>
-              )}
-            </button>
+          {THEMES.filter(t => !t.light).map(t => (
+            <ThemeButton key={t.id} t={t} active={theme === t.id} accent={accent} onClick={() => setTheme(t.id)} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── 배경 테마 — 라이트 ── */}
+      <div className="card p-5 mb-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          ☀️ 라이트 테마
+        </p>
+        <div className="grid grid-cols-3 gap-2.5">
+          {THEMES.filter(t => t.light).map(t => (
+            <ThemeButton key={t.id} t={t} active={theme === t.id} accent={accent} onClick={() => setTheme(t.id)} />
           ))}
         </div>
       </div>
@@ -131,8 +121,8 @@ export default function AppearancePage() {
                 className="w-full h-10 rounded-[12px] transition-all"
                 style={{
                   background: c.id,
-                  border: `2.5px solid ${accent === c.id ? 'rgba(255,255,255,0.7)' : 'transparent'}`,
-                  boxShadow: accent === c.id ? `0 0 16px ${c.id}70` : undefined,
+                  border: `2.5px solid ${accent === c.id ? 'rgba(255,255,255,0.75)' : 'transparent'}`,
+                  boxShadow: accent === c.id ? `0 0 14px ${c.id}70` : undefined,
                 }}
               />
               <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.38)' }}>{c.label}</span>
@@ -151,5 +141,36 @@ export default function AppearancePage() {
         {saved ? '저장됐어요!' : '저장하기'}
       </button>
     </>
+  )
+}
+
+function ThemeButton({ t, active, accent, onClick }: {
+  t: { id: string; label: string; emoji: string; bg: string; light: boolean }
+  active: boolean; accent: string; onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="relative h-[68px] rounded-[14px] overflow-hidden transition-all"
+      style={{
+        background: t.bg,
+        border: `2px solid ${active ? accent : t.light ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)'}`,
+        boxShadow: active ? `0 0 16px ${accent}50` : undefined,
+      }}
+    >
+      <span className="absolute top-2.5 left-0 right-0 text-center text-base leading-none">{t.emoji}</span>
+      <span
+        className="absolute bottom-2 left-0 right-0 text-center text-[10px] font-semibold"
+        style={{ color: t.light ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}
+      >
+        {t.label}
+      </span>
+      {active && (
+        <div className="absolute top-2 right-2 w-[14px] h-[14px] rounded-full flex items-center justify-center"
+          style={{ background: accent }}>
+          <Check className="w-2 h-2 text-white" />
+        </div>
+      )}
+    </button>
   )
 }
